@@ -1,17 +1,32 @@
+from __future__ import annotations
 import pandas as pd
 import os
 import json
+import yaml
+
 
 chunk_size = 100000
 LARGE_FILE_THRESHOLD = 1 * 1024 * 1024 * 1024
 
 
-def read(file, where: str = None):
+def transform(yaml_file: str, df: pd.DataFrame) -> pd.DataFrame:
+    with open(yaml_file, "r", encoding="utf-8") as f:
+        columl_rename = yaml.safe_load(f)
+    return df.rename(columns=columl_rename)
+
+
+def extract(df: pd.DataFrame, file_name: str) -> None:
+    list_of_records = df.to_dict(orient="records")
+    with open(file_name, "w", encoding="utf-8") as f:
+        json.dump(list_of_records, f, ensure_ascii=False, indent=2)
+
+
+def load(file: str, where: str = None) -> pd.DataFrame:
     file_size = os.path.getsize(file)
     df = None
     if file_size >= LARGE_FILE_THRESHOLD:
         list_of_chunks = []
-        df = pd.read_csv(file, chunksize=chunk_size)
+        df = pd.read_csv(file, chunksize=chunk_size, parse_dates=["date"])
 
         for chunk in df:
             if where:
@@ -28,9 +43,3 @@ def read(file, where: str = None):
         if where:
             df = df.query(where)
     return df
-
-
-def to_json(df):
-    list_of_records = df.to_dict(orient="records")
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(list_of_records, f, ensure_ascii=False, indent=2)
