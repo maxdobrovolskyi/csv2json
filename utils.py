@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import json
 import yaml
+import sys
 
 
 chunk_size = 100000
@@ -15,10 +16,15 @@ def transform(yaml_file: str, df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=columl_rename)
 
 
-def extract(df: pd.DataFrame, file_name: str) -> None:
+def extract(df: pd.DataFrame, file_name: str | None, pretty: bool) -> None:
     list_of_records = df.to_dict(orient="records")
-    with open(file_name, "w", encoding="utf-8") as f:
-        json.dump(list_of_records, f, ensure_ascii=False, indent=2)
+    level = 2 if pretty else 0
+    if file_name:
+        with open(file_name, "w", encoding="utf-8") as f:
+            json.dump(list_of_records, f, ensure_ascii=False, indent=level)
+    else:
+        json.dump(list_of_records, sys.stdout, ensure_ascii=False, indent=level)
+        sys.stdout.write("\n")
 
 
 def load(file: str, where: str = None) -> pd.DataFrame:
