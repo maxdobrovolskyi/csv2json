@@ -1,4 +1,5 @@
 import argparse
+from utils import read, to_json
 
 
 def args_parser():
@@ -12,11 +13,9 @@ def args_parser():
     return parser.parse_args()
 
 
-def something(input, output, map, where):
-    print(input, output, map, where)
-
-
 if __name__ == "__main__":
     args = args_parser()
 
-    something(args.input, args.output, args.map, args.where)
+    # something(args.input, args.output, args.map, args.where)
+    df = read(file=args.input, where=args.where)
+    to_json(df)
