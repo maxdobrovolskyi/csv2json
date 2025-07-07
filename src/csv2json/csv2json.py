@@ -42,11 +42,16 @@ def main():
     args = build_cli()
     try:
         df = load(file=args.input, where=args.where, dates=args.date_cols)
+        logger.info("file has been processed")
         if args.date_cols and args.date_cols in df.columns:
             df[args.date_cols] = df[args.date_cols].dt.strftime("%Y-%m-%d")
+            logger.info("date column has been found")
         if args.map:
             df = transform(yaml_file=args.map, df=df)
+            logger.info("mapping was applied successfully")
         extract(df, file_name=args.output, pretty=args.pretty)
+        if args.output:
+            logger.info(f"file {args.output} has been created")
     except OSError as e:
         logger.error(f"Error loading file: {e}")
         sys.exit(1)

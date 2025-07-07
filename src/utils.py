@@ -1,9 +1,8 @@
 from __future__ import annotations
+import os, json, sys, yaml
+
 import pandas as pd
-import os
-import json
-import yaml
-import sys
+
 import config
 
 
@@ -20,7 +19,8 @@ def extract(df: pd.DataFrame, file_name: str | None, pretty: bool) -> None:
     list_of_records = df.to_dict(orient="records")
     level = 2 if pretty else 0
     if file_name:
-        with open(file_name, "w", encoding="utf-8") as f:
+        target_file_path = config.DIR.parent / "data" / file_name
+        with open(target_file_path, "w", encoding="utf-8") as f:
             json.dump(list_of_records, f, ensure_ascii=False, indent=level)
     else:
         json.dump(list_of_records, sys.stdout, ensure_ascii=False, indent=level)

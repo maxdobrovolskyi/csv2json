@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name="csv2json"
+version="0.1.0"
+authors=[{name = "Maksym Dobrovolskyi", email="max.dobrikE@gmail.com"}]
+readme="README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["csv", "json", "converter", "data"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas>=2.3.1", 
+    "pyyaml>=6.0.2"
+]
+
+[project.scripts]
+csv2json = "csv2json.csv2json:main"
+
+[project.urls]
+Repository = "https://github.com/maxdobrovolskyi/csv2json"
+
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "black"
+]
