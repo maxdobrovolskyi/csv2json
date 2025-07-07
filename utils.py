@@ -4,16 +4,16 @@ import os
 import json
 import yaml
 import sys
-
-
-chunk_size = 100000
-LARGE_FILE_THRESHOLD = 1 * 1024 * 1024 * 1024
+import config
 
 
 def transform(yaml_file: str, df: pd.DataFrame) -> pd.DataFrame:
     with open(yaml_file, "r", encoding="utf-8") as f:
-        columl_rename = yaml.safe_load(f)
-    return df.rename(columns=columl_rename)
+        try:
+            column_rename = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            print(e)
+    return df.rename(columns=column_rename)
 
 
 def extract(df: pd.DataFrame, file_name: str | None, pretty: bool) -> None:
@@ -27,13 +27,15 @@ def extract(df: pd.DataFrame, file_name: str | None, pretty: bool) -> None:
         sys.stdout.write("\n")
 
 
-def load(file: str, where: str = None) -> pd.DataFrame:
+def load(file: str, dates: str, where: str = None) -> pd.DataFrame:
     file_size = os.path.getsize(file)
     df = None
-    if file_size >= LARGE_FILE_THRESHOLD:
+    if file_size >= config.LARGE_FILE_THRESHOLD:
         list_of_chunks = []
-        df = pd.read_csv(file, chunksize=chunk_size, parse_dates=["date"])
-
+        if dates:
+            df = pd.read_csv(file, chunksize=config.CHUNK_SIZE, parse_dates=[dates])
+        else:
+            df = pd.read_csv(file, chunksize=config.CHUNK_SIZE)
         for chunk in df:
             if where:
                 filtered_query = chunk.query(where)
@@ -42,10 +44,11 @@ def load(file: str, where: str = None) -> pd.DataFrame:
                 list_of_chunks.append(chunk)
 
         df = pd.concat(list_of_chunks, ignore_index=True)
-        if where:
-            df = df.query(where)
     else:
-        df = pd.read_csv(file)
+        if dates:
+            df = pd.read_csv(file, parse_dates=[dates])
+        else:
+            df = pd.read_csv(file)
         if where:
             df = df.query(where)
     return df
