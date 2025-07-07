@@ -1,2 +1,0 @@
-2025-07-07 20:01:48,910 - logger - INFO - app started
-2025-07-07 20:01:48,911 - logger - ERROR - Error loading file: [Errno 2] No such file or directory: './tes.csv'
